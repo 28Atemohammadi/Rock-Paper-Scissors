@@ -1,57 +1,53 @@
-function getComputerChoice(){
-  const randomNum = Math.random();
-    if (randomNum < 1/3 ) return "rock";
-    else if (randomNum < 2/3 ) return "paper";
-    else 
-        return "scissors";
+let humanScore = 0;   // امتیاز های اولی
+let computerScore = 0;
+
+function getComputerChoice() {  // انتخاب تصادفی کامپیوتر 
+  const choices = ["rock", "paper", "scissors"];
+  const randomIndex = Math.floor(Math.random() * 3);
+  return choices[randomIndex];
 }
-console.log("computer choice:" , getComputerChoice());
 
-function getHumanChoice(){
-    const answer = prompt("Please enter the Rock, Paper, or Scissors?").toLowerCase();
-    return answer;
+function playRound(humanChoice, computerChoice) {   //منطق برنده‌ی هر راند
+  if (humanChoice === computerChoice) return "tie";
+  if (
+    (humanChoice === "rock" && computerChoice === "scissors") ||
+    (humanChoice === "paper" && computerChoice === "rock") ||
+    (humanChoice === "scissors" && computerChoice === "paper")
+  ) {
+    return "human";
+  }
+  return "computer";
 }
-console.log("human choice : " , getHumanChoice());
 
+function updateUI(humanChoice) {   // تابع اصلی برای اجرای بازی (با UI)
+  if (humanScore >= 5 || computerScore >= 5) return;   // این تابع هر بار که کاربر روی یکی از دکمه‌ها کلیک کنه اجرا میشه.
+                                                    
+  const computerChoice = getComputerChoice();   //کامپیوتر یک انتخاب جدید انجام می‌ده
+  const result = playRound(humanChoice, computerChoice);    //تابع playRound اجرا می‌شه تا نتیجه مشخص بشه
 
+  const roundResult = document.getElementById("round-result");   // بروزرسانی متن صفحه (نتیجه و امتیاز)
+  const scoreDisplay = document.getElementById("score");
+  const winnerDisplay = document.getElementById("winner");
 
-function playGame(){
-    let humanScore = 0;
-    let computerScore = 0;
+  if (result === "tie") {
+    roundResult.textContent = `It's a tie! Both chose ${humanChoice}`;
+  } else if (result === "human") {
+    humanScore++;
+    roundResult.textContent = `You win! ${humanChoice} beats ${computerChoice}`;
+  } else {
+    computerScore++;
+    roundResult.textContent = `You lose! ${computerChoice} beats ${humanChoice}`;
+  }
 
-function playRound(humanChoice,computerChoice){
+  scoreDisplay.textContent = `Human: ${humanScore} | Computer: ${computerScore}`;
 
-    const human = humanChoice.toLowerCase();
-    const computer = computerChoice.toLowerCase();
-
-    if (human === computer ) {
-        console.log("It's a tie!");
-    }else if (
-        (human === "rock" && computer === "scissors")||
-        (human === "paper" && computer === "rock")||
-        (human === "scissors" && computer === "paper")
-    ){
-    console.log(`You win! ${human} beats ${computer}`);
-    humanScore++ ;
-    }else{
-         
-        console.log(`You lose! ${computer} beats ${human}`);
-        computerScore++;
-    }
+  if (humanScore === 5 || computerScore === 5) { //اعلام برنده نهایی
+    const finalWinner = humanScore > computerScore ? "You won the game!" : "Computer won the game!";
+    winnerDisplay.textContent = finalWinner;
+  }
 }
-    for ( let i = 0; i < 5 ; i++){
-    const humanSelection = getHumanChoice();
-    const computerSelection = getComputerChoice();
-    playRound(humanSelection,computerSelection);
-    console.log(`Round ${i + 1}: Human: ${humanScore}, Computer: ${computerScore}`);
-    }
 
-    if (humanScore > computerScore ){
-        console.log("You won the game!");
-    }else if (humanScore < computerScore ) {
-        console.log("Computer won the game!");
-    }else{
-        console.log("The game is a tie!");
-    }
-}
-playGame();
+// Event listeners   //اتصال دکمه‌ها به بازی
+document.getElementById("rock").addEventListener("click", () => updateUI("rock"));   // هر دکمه با کلیک، بازی رو با انتخاب مربوطه اجرا می‌کنه
+document.getElementById("paper").addEventListener("click", () => updateUI("paper"));
+document.getElementById("scissors").addEventListener("click", () => updateUI("scissors"));
